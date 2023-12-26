@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ajouter une opération</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 400px;
+            /* Ajusté la largeur du formulaire */
+            margin: auto;
+            /* Centré horizontalement */
+        }
+
+        h1 {
+            position: absolute;
+            /* Ajout d'une position absolue à l'élément h1 */
+            top: 50%;
+            /* Centrage vertical */
+            left: 15%;
+            /* Centrage horizontal */
+            transform: translate(-50%, -50%);
+            /* Centrage absolu */
+            color: #333;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 10px;
+            /* Ajusté la taille du padding pour un aspect plus spacieux */
+            margin-bottom: 16px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+            /* Ajusté la taille de la police */
+        }
+
+        input[type="submit"] {
+            background-color: #4caf50;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 16px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+            /* Ajouter une hauteur spécifique pour le champ de texte */
+            height: 100px;
+            /* Ajustez la hauteur selon vos besoins */
+            resize: vertical;
+            /* Permet aux utilisateurs de redimensionner verticalement le champ de texte */
+        }
+    </style>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+</head>
+
+<body>
+    <h1>Ajouter une opération</h1>
+
+    <form>
+        <label for="serveur">ID serveur :</label>
+        <input type="text" id="serveur" name="serveur">
+
+        <label for="plat">ID plat:</label>
+        <input type="text" id="plat" name="plat">
+        <input onclick="envoye(event)" type="submit" value="servir">
+        <input onclick="afficher(event)" type="submit" value="ETAT des plats">
+    </form>
+
+    <script>
+        const socket = io.connect();
+        socket.on("platservi", (data) => {
+            console.log("platservi" + JSON.stringify(data))
+            s = document.createElement("p")
+            s.innerHTML = ("<center>" + "Idserveur" + ":" + data.id_serveur + "<br>" + "idPlat :" + data.id + "</center>")
+            document.body.appendChild(s)
+
+        })
+
+        socket.on("aff", (data) => {
+            console.log("aff" + JSON.stringify(data))
+            s = document.createElement("p")
+            s.innerHTML = ("<center>" + "Etat des plats : " + "<br>" + "Nom du plat" + ": " + data.nom + "<br>" + "idServeur : " + data.id_serveur + "<br>" + "prix : " + data.prix + "<br>" + "etat : " + data.etat + "<br>" + "Descreption : " + data.description + "</center>")
+            document.body.appendChild(s)
+
+        })
+
+          
+        function envoye(event) {
+            event.preventDefault();
+            // Utilisez document.getElementById pour récupérer les valeurs des champs
+            const serveur = document.getElementById("serveur").value;
+            const plat = document.getElementById("plat").value;
+
+            const platData = {
+                id: plat,
+                id_serveur: serveur,
+            };
+
+            socket.emit("platservi", platData);
+            console.log("plat" + JSON.stringify(platData));
+        }
+
+        function afficher(event) {
+            event.preventDefault();
+            // Utilisez document.getElementById pour récupérer les valeurs des champs
+            const plat = document.getElementById("plat").value;
+
+            const platData = {
+                id: plat,
+            };
+
+            socket.emit("aff", platData);
+            console.log("plat afficher" + JSON.stringify(platData));
+        }
+
+
+
+    </script>
+</body>
+
+</html>
